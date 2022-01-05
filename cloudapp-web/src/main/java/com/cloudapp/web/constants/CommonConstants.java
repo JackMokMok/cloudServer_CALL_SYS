@@ -4,7 +4,7 @@ public class CommonConstants {
 	/**
 	 * 系统版本号
 	 */
-	public static final String SYS_VERSION = "1.0.0";
+	public static final String SYS_VERSION = "1.0.1";
 	
 	// session key
 	/**
