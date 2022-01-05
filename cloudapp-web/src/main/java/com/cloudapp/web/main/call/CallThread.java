@@ -82,6 +82,7 @@ public class CallThread extends Thread {
             logger.warn("Socket启动...");
             logger.warn("Socket启动2...");
             logger.warn("Socket启动3...");
+            logger.warn("hot-fix Socket启动3...");
             serverSocket = new ServerSocket(10086);
             while (true){
                 final Socket socket = serverSocket.accept();
