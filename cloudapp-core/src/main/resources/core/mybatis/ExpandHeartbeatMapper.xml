@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.ExpandHeartbeatDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.ExpandHeartbeat">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="VARCHAR" />
+		<result column="h_time" property="hTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, mac, h_time
+		from tb_expand_heartbeat
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getByMac" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		mac = #{mac,jdbcType=VARCHAR}
+		limit 1
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_expand_heartbeat
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.ExpandHeartbeat" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_expand_heartbeat 
+		(id, mac, h_time)
+		values 
+		(#{id,jdbcType=INTEGER}, #{mac,jdbcType=VARCHAR}, #{hTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.ExpandHeartbeat">
+		update tb_expand_heartbeat
+		set h_time = #{hTime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.ExpandHeartbeat"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="mac != null and mac !=''">
+			mac = #{mac,jdbcType=VARCHAR} and
+		</if>
+		1 order by id
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.mac != null and bean.mac !=''">
+			mac = #{bean.mac,jdbcType=VARCHAR} and
+		</if>
+		1 order by id
+	</select>
+</mapper>

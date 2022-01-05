@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.CusGroupDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.CusGroup">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, name
+		from tb_customer_group
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_customer_group
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.CusGroup" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_customer_group 
+		(id, name)
+		values 
+		(#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR})
+	</insert>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.CusGroup">
+		update tb_customer_group
+		<set>
+			<if test="name != null and name != ''">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.CusGroup"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="name != null and name !=''">
+			name = #{name,jdbcType=VARCHAR} and
+		</if>
+		1 order by id
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.name != null and bean.name !=''">
+			name like CONCAT('%',#{bean.name,jdbcType=VARCHAR},'%') and
+		</if>
+		1 order by id
+	</select>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.ExpandCategoryDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.ExpandCategory">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		
+		<result column="default_conf" property="defaultConf" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, `name`, code,
+		default_conf
+		from tb_expand_category
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_expand_category
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.ExpandCategory" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_expand_category 
+		(id, name, code,
+		default_conf)
+		values 
+		(#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR},
+		#{defaultConf,jdbcType=VARCHAR})
+	</insert>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.ExpandCategory">
+		update tb_expand_category
+		<set>
+			<if test="name != null and name != ''">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="code != null and code != ''">
+				code = #{code,jdbcType=VARCHAR},
+			</if>
+			<if test="defaultConf != null">
+				default_conf = #{defaultConf,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.ExpandCategory"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="name != null and name !=''">
+			name = #{name,jdbcType=VARCHAR} and
+		</if>
+		<if test="code != null and code !=''">
+			code = #{code,jdbcType=VARCHAR} and
+		</if>
+		1
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.name != null and bean.name !=''">
+			name like CONCAT('%',#{bean.name,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="bean.code != null and bean.code !=''">
+			code like CONCAT('%',#{bean.code,jdbcType=VARCHAR},'%') and
+		</if>
+		1 order by id
+	</select>
+</mapper>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.CallerHostHeartbeatDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.CallerHostHeartbeat">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="VARCHAR" />
+		<result column="h_time" property="hTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, mac, h_time
+		from tb_caller_host_heartbeat
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getByMac" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		mac = #{mac,jdbcType=VARCHAR}
+		limit 1
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_caller_host_heartbeat
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.CallerHostHeartbeat" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_caller_host_heartbeat
+		(id, mac, h_time)
+		values 
+		(#{id,jdbcType=INTEGER}, #{mac,jdbcType=VARCHAR}, #{hTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.CallerHostHeartbeat">
+		update tb_caller_host_heartbeat
+		set h_time = #{hTime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.CallerHostHeartbeat"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="mac != null and mac !=''">
+			mac = #{mac,jdbcType=VARCHAR} and
+		</if>
+		1 order by id
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.mac != null and bean.mac !=''">
+			mac = #{bean.mac,jdbcType=VARCHAR} and
+		</if>
+		1 order by id
+	</select>
+	
+	<select id="getCount" parameterType="java.lang.Integer"
+		resultType="Integer">
+		select count(1)
+		from tb_caller_host_heartbeat
+		where
+		<if test="status == 1">
+			<![CDATA[
+				h_time >= DATE_SUB(NOW(), interval 180 second) and
+			]]> 
+		</if>
+		
+		<if test="status == 0">
+		  	<![CDATA[
+				 h_time < DATE_SUB(NOW(), interval 180 second) and
+			]]>
+		</if>
+		1
+	</select>
+</mapper>

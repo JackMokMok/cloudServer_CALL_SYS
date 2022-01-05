@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.ExpandDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.Expand">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="customer_id" property="customerId" jdbcType="INTEGER" />
+		<result column="caller_group_id" property="callerGroupId" jdbcType="INTEGER" />
+		
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="mac" property="mac" jdbcType="VARCHAR" />
+		
+		<result column="conf" property="conf" jdbcType="VARCHAR" />
+		<result column="app_version" property="appVersion" jdbcType="INTEGER" />
+		<result column="off_time" property="offTime" jdbcType="BIGINT" />
+		
+		<result column="category_name" property="categoryName" jdbcType="VARCHAR" />
+		<result column="group_name" property="groupName" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		d.id, d.customer_id, d.caller_group_id,
+		d.code, d.name, d.mac,
+		d.conf, d.app_version,
+		TIMESTAMPDIFF(SECOND,h.h_time,NOW()) as off_time,
+		c.name as category_name,
+		g.name as group_name
+		from tb_expand d
+		left outer
+		join tb_expand_heartbeat h on
+		d.mac = h.mac
+		left outer
+		join tb_expand_category c on
+		d.code = c.code
+		left outer
+		join tb_caller_group g on
+		d.caller_group_id = g.id
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		d.id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_expand
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.Expand" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_expand 
+		(id, customer_id, caller_group_id,
+		code, `name`, mac,
+		conf, app_version)
+		values 
+		(#{id,jdbcType=INTEGER}, #{customerId,jdbcType=INTEGER}, #{callerGroupId,jdbcType=INTEGER},
+		#{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{mac,jdbcType=VARCHAR},
+		#{conf,jdbcType=VARCHAR}, #{appVersion,jdbcType=INTEGER})
+	</insert>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.Expand">
+		update tb_expand
+		<set>
+			<if test="callerGroupId != null">
+				caller_group_id = #{callerGroupId,jdbcType=INTEGER},
+			</if>
+			<if test="code != null and code != ''">
+				code = #{code,jdbcType=VARCHAR},
+			</if>
+			<if test="name != null and name != ''">
+				`name` = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="mac != null and mac != ''">
+				mac = #{mac,jdbcType=VARCHAR},
+			</if>
+			<if test="conf != null">
+				conf = #{conf,jdbcType=VARCHAR},
+			</if>
+			<if test="appVersion != null">
+				app_version = #{appVersion,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<select id="getByMac" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		where
+		d.mac = #{mac,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.Expand"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="customerId != null">
+			d.customer_id = #{customerId,jdbcType=INTEGER} and
+		</if>
+		<if test="callerGroupId != null">
+			d.caller_group_id = #{callerGroupId,jdbcType=INTEGER} and
+		</if>
+		<if test="name != null and name !=''">
+			d.name like CONCAT('%',#{name,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="mac != null and mac !=''">
+			d.mac = #{mac,jdbcType=VARCHAR} and
+		</if>
+		<if test="code != null and code !=''">
+			d.code = #{code,jdbcType=VARCHAR} and
+		</if>
+		1
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.customerId != null">
+			d.customer_id = #{bean.customerId,jdbcType=INTEGER} and
+		</if>
+		<if test="bean.callerGroupId != null">
+			d.caller_group_id = #{bean.callerGroupId,jdbcType=INTEGER} and
+		</if>
+		<if test="bean.name != null and bean.name !=''">
+			d.name like CONCAT('%',#{bean.name,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="bean.mac != null and bean.mac !=''">
+			d.mac like CONCAT('%',#{bean.mac,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="bean.code != null and bean.code !=''">
+			d.code = #{bean.code,jdbcType=VARCHAR} and
+		</if>
+		<if test="bean.online == 1">
+			<![CDATA[
+				h.h_time is not null and 
+				h.h_time >= DATE_SUB(NOW(), interval 180 second) and
+			]]> 
+		</if>
+		
+		<if test="bean.online == 0">
+		  	<![CDATA[
+				 (h.h_time is null or h.h_time < DATE_SUB(NOW(), interval 180 second))  and
+			]]>
+		</if>
+		1 order by d.id desc
+	</select>
+	
+	<select id="findAllPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		d.id, d.customer_id, d.caller_group_id,
+		d.code, d.name, d.mac,
+		d.conf, d.app_version,
+		TIMESTAMPDIFF(SECOND,h.h_time,NOW()) as off_time,
+		c.name as category_name,
+		g.name as group_name
+		from tb_expand d
+		left outer
+		join tb_expand_heartbeat h on
+		d.mac = h.mac
+		left outer
+		join tb_customer c on
+		d.customer_id = c.id
+		left outer
+		join tb_expand_category g on
+		d.code = g.code
+		where
+		<if test="bean.name != null and bean.name !=''">
+			d.name like CONCAT('%',#{bean.name,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="bean.mac != null and bean.mac !=''">
+			d.mac like CONCAT('%',#{bean.mac,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="bean.code != null and bean.code !=''">
+			d.code = #{bean.code,jdbcType=VARCHAR} and
+		</if>
+		<if test="bean.online == 1">
+			<![CDATA[
+				h.h_time is not null and 
+				h.h_time >= DATE_SUB(NOW(), interval 180 second) and
+			]]> 
+		</if>
+		
+		<if test="bean.online == 0">
+		  	<![CDATA[
+				 (h.h_time is null or h.h_time < DATE_SUB(NOW(), interval 180 second))  and
+			]]>
+		</if>
+		1 order by d.customer_id
+	</select>
+</mapper>

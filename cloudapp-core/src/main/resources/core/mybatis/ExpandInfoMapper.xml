@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.ExpandInfoDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.ExpandInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="VARCHAR" />
+		<result column="build_board" property="buildBoard" jdbcType="VARCHAR" />
+		
+		<result column="build_id" property="buildId" jdbcType="VARCHAR" />
+		<result column="build_model" property="buildModel" jdbcType="VARCHAR" />
+		<result column="build_display" property="buildDisplay" jdbcType="VARCHAR" />
+		
+		<result column="build_time" property="buildTime" jdbcType="BIGINT" />
+		
+		<result column="lan_ip" property="lanIp" jdbcType="VARCHAR" />
+		<result column="free_storage" property="freeStorage" jdbcType="BIGINT" />
+		<result column="login_time" property="loginTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, mac, build_board,
+		build_id, build_model, build_display,
+		build_time,
+		lan_ip, free_storage, login_time
+		from tb_expand_info
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="getByMac" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		mac = #{mac,jdbcType=VARCHAR}
+		limit 1
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_expand_info
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.ExpandInfo" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_expand_info
+		(id, mac, build_board,
+		build_id, build_model, build_display,
+		build_time,
+		lan_ip, free_storage, 
+		ver_name, ver_code,
+		login_time)
+		values 
+		(#{id,jdbcType=INTEGER}, #{mac,jdbcType=VARCHAR}, #{buildBoard,jdbcType=VARCHAR},
+		#{buildId,jdbcType=VARCHAR}, #{buildModel,jdbcType=VARCHAR}, #{buildDisplay,jdbcType=VARCHAR}, 
+		#{buildTime,jdbcType=BIGINT},
+		#{lanIp,jdbcType=VARCHAR}, #{freeStorage,jdbcType=BIGINT}, 
+		#{verName,jdbcType=VARCHAR}, #{verCode,jdbcType=INTEGER}, 
+		#{loginTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.ExpandInfo">
+		update tb_expand_info
+		set
+		build_board = #{buildBoard,jdbcType=VARCHAR},
+		build_id = #{buildId,jdbcType=VARCHAR},
+		build_model = #{buildModel,jdbcType=VARCHAR},
+		build_display = #{buildDisplay,jdbcType=VARCHAR},
+		build_time = #{buildTime,jdbcType=BIGINT},
+		lan_ip = #{lanIp,jdbcType=VARCHAR},
+		free_storage = #{freeStorage,jdbcType=BIGINT},
+		ver_name = #{verName,jdbcType=VARCHAR},
+		ver_code = #{verCode,jdbcType=INTEGER},
+		login_time = #{loginTime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.ExpandInfo"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="mac != null and mac !=''">
+			mac = #{mac,jdbcType=VARCHAR} and
+		</if>
+		1 order by id
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.mac != null and bean.mac !=''">
+			mac = #{bean.mac,jdbcType=VARCHAR} and
+		</if>
+		1 order by id
+	</select>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.FileInfoDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.FileInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="path" property="path" jdbcType="VARCHAR" />
+		<result column="md5" property="md5" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, path, md5
+		from tb_file_info 
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_file_info
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.cloudapp.core.entity.FileInfo" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_file_info 
+		(id, path, md5)
+		values 
+		(#{id,jdbcType=INTEGER}, #{path,jdbcType=VARCHAR}, #{md5,jdbcType=VARCHAR})
+	</insert>
+	
+	<update id="updateSelective" parameterType="com.cloudapp.core.entity.FileInfo">
+		update tb_file_info
+		<set>
+			<if test="path != null and path != ''">
+				path = #{path,jdbcType=VARCHAR},
+			</if>
+			<if test="md5 != null and md5 != ''">
+				md5 = #{md5,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.FileInfo">
+		update tb_file_info
+		set 
+		path = #{path,jdbcType=VARCHAR},
+		md5 = #{md5,jdbcType=VARCHAR}
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.FileInfo"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="path != null and path !=''">
+			path = #{path,jdbcType=VARCHAR} and
+		</if>
+		<if test="md5 != null and md5 !=''">
+			md5 = #{md5,jdbcType=VARCHAR} and
+		</if>
+		1 order by id desc
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.path != null and bean.path !=''">
+			path = #{bean.path,jdbcType=VARCHAR} and
+		</if>
+		<if test="bean.md5 != null and bean.md5 !=''">
+			md5 = #{bean.md5,jdbcType=VARCHAR} and
+		</if>
+		1 order by id desc
+	</select>
+</mapper>

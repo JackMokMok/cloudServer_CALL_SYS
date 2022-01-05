@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<!-- 初始化所有url，同时菜单也基于此结构组织 -->
+	<pathGroups>
+		<!-- visible表示是否在菜单中显示 -->
+		<pathGroup name="基础功能" code="basic" visible="0">
+			<!-- visible表示是否在菜单中显示，opening表示是否为开放功能，logEnable表示是否记录日志， operateKey表示日志记录的键, code是路径 -->
+			<path code="login" name="登录" visible="0" opening="1" />
+			<path code="index" name="首页" visible="0" opening="1" />
+			<path code="pwd" name="修改密码" visible="0" opening="1" />
+			<path code="edit-pwd" name="修改默认密码" visible="0" opening="1" />
+			<path code="update-default-pwd" name="更新默认密码" visible="0" opening="1" />
+			<path code="update-pwd" name="修改密码" visible="0" opening="1" />
+			<path code="copyright" name="版权信息" visible="0" opening="1" />
+			<!-- 因为用的是大类关键字，所以这两个http请求的url没有包括有大类，所以为了可访问该地址，则设opening为1 -->
+			
+			<path code="upload-file" name="上传文件" visible="0" opening="1" />
+            <path code="remove-file" name="删除文件" visible="0" opening="1" />
+            
+            <path code="check-file" name="检测文件" visible="0" opening="1" />
+		</pathGroup>
+
+		<pathGroup name="账号管理" code="admin" visible="1">
+			<path code="admin/admin-list" name="账号列表" visible="1" />
+			<path code="admin/edit-admin" name="账号编辑" visible="0" />
+			<path code="admin/save-admin" name="保存账号" visible="0" />
+			<path code="admin/del-admin" name="删除账号" visible="0" />
+			<path code="admin/login-history" name="登录历史" visible="0" />
+			
+			<path code="admin/role-list" name="角色列表" visible="1" />
+			<path code="admin/edit-role" name="角色编辑" visible="0" />
+			<path code="admin/save-role" name="保存角色" visible="0" />
+			<path code="admin/del-role" name="删除角色" visible="0" />
+		</pathGroup>
+
+		<pathGroup name="场所管理" code="customer" visible="1">
+			<path code="customer/customer-list" name="场所列表" visible="1" />
+			<path code="customer/edit-customer" name="场所编辑" visible="0" />
+			<path code="customer/save-customer" name="保存场所" visible="0" />
+			<path code="customer/del-customer" name="删除场所" visible="0" />
+			<path code="customer/edit-auths" name="批量编辑授权" visible="0" />
+			<path code="customer/save-auths" name="批量保存授权" visible="0" />
+
+			<path code="customer/group-list" name="场所分组" visible="1" />
+			<path code="customer/edit-group" name="分组编辑" visible="0" />
+			<path code="customer/save-group" name="保存分组" visible="0" />
+			<path code="customer/del-group" name="删除分组" visible="0" />
+		</pathGroup>
+
+		<pathGroup name="呼叫系统" code="callers" visible="1">
+			<path code="callers/all-caller-host-list" name="呼叫主机列表" visible="1" />
+			<path code="callers/all-caller-list" name="呼叫器列表" visible="1" />
+			<path code="callers/edit-all-caller" name="呼叫器编辑" visible="0" />
+			<path code="callers/save-all-caller" name="保存呼叫器" visible="0" />
+			<path code="callers/del-all-caller" name="删除呼叫器" visible="0" />
+		</pathGroup>
+
+		<pathGroup name="呼叫主机" code="host" visible="1">
+			<path code="host/caller-host-list" name="呼叫主机列表" visible="0" />
+			<path code="host/edit-caller-host" name="呼叫主机编辑" visible="0" />
+			<path code="host/save-caller-host" name="保存呼叫主机" visible="0" />
+			<path code="host/del-caller-host" name="删除呼叫主机" visible="0" />
+		</pathGroup>
+
+		<pathGroup name="呼叫器" code="caller" visible="1">
+			<path code="caller/caller-list" name="呼叫器列表" visible="0" />
+			<path code="caller/edit-caller" name="呼叫器编辑" visible="0" />
+			<path code="caller/save-caller" name="保存呼叫器" visible="0" />
+			<path code="caller/del-caller" name="删除呼叫器" visible="0" />
+			<path code="caller/empty-caller" name="清空呼叫器" visible="0" />
+
+			<path code="caller/down-callers" name="批量导出呼叫器" visible="0" />
+			<path code="caller/edit-callers" name="批量编辑呼叫器" visible="0" />
+			<path code="caller/save-callers" name="批量保存呼叫器" visible="0" />
+
+			<path code="caller/caller-category-list" name="呼叫器类型列表" visible="0" />
+			<path code="caller/edit-caller-category" name="编辑呼叫器类型" visible="0" />
+			<path code="caller/save-caller-category" name="保存呼叫器类型" visible="0" />
+
+			<path code="caller/caller-group-list" name="呼叫器分组列表" visible="0" />
+			<path code="caller/edit-caller-group" name="编辑呼叫器分组" visible="0" />
+			<path code="caller/save-caller-group" name="保存呼叫器分组" visible="0" />
+		</pathGroup>
+
+		<pathGroup name="扩展系统" code="expands" visible="1">
+			<path code="expands/category-list" name="设备类型" visible="1" />
+			<path code="expands/edit-category" name="类型编辑" visible="0" />
+			<path code="expands/save-category" name="保存类型" visible="0" />
+			<path code="expands/del-category" name="删除类型" visible="0" />
+		</pathGroup>
+
+		<pathGroup name="扩展设备" code="expand" visible="1">
+			<path code="expand/expand-list" name="设备列表" visible="0" />
+			<path code="expand/edit-expand" name="设备编辑" visible="0" />
+			<path code="expand/save-expand" name="保存设备" visible="0" />
+			<path code="expand/del-expand" name="删除设备" visible="0" />
+			<path code="expand/expand-details" name="设备详情" visible="0" />
+		</pathGroup>
+
+		<pathGroup name="互动管理" code="message" visible="1">
+			<path code="message/call-list" name="呼叫信息" visible="0" />
+			<path code="message/finish-call" name="完成呼叫" visible="0" />
+			<path code="message/empty-call" name="清空呼叫" visible="0" />
+		</pathGroup>
+
+	</pathGroups>
+
+</config>

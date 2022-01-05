@@ -1,0 +1,118 @@
+@charset "utf-8";
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}img{border:0}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit}input,textarea,select{*font-size:100%}
+.fl{
+	float:left
+}
+.fr{
+	float:right
+}
+html{
+	background:#D8E7FA
+}
+.login{
+	background:#d3e5f8 url(../images/login_bg.jpg) no-repeat center top;
+	padding:200px 0 0;
+	font-family:Microsoft YaHei;
+}
+.login_box{
+	background:#fff;
+	width:514px;
+	margin:0 auto;
+	border:5px solid #8BAABF;
+	position:relative
+}
+.logo{
+	background:url(../images/login_logo.png) no-repeat left center;
+	width:200px;
+	height:130px;
+	float:left;
+	overflow:hidden
+}
+.login .login_form{
+	padding:20px 10px;
+	border:1px solid #6498D4;
+}
+.login .login_form .inpt{
+	height:175px
+}
+.login .login_form .inpt dd{
+	padding:5px 0
+}
+.login .login_form .inpt input{
+	height:26px;
+	color:#B7CDD8;
+	border:none;
+	padding-top:10px;
+	padding-right:10px;
+	padding-bottom:10px;
+	font-size:16px;
+	border:1px solid #84A4C1;
+}
+.login .crop,.login .userName,.login .password{
+	width:246px;
+}
+.login .userName{
+	background:#fff url(../images/uername_icon.gif) 10px center no-repeat;
+	padding-left:30px
+}
+.login .password{
+	background:#fff url(../images/pwd_icon.gif) 10px center no-repeat;
+	padding-left:30px
+}
+
+.login .crop{
+	background:#fff url(../images/crop.png) 10px center no-repeat;
+	padding-left:30px
+}
+
+.login .verifCode{
+	background:#fff url(../images/vcode_icon.gif) 10px center no-repeat;
+	padding-left:30px
+}
+.login .verifCode{
+	width:100px
+}
+.login .verifImg{
+	display: block;
+    overflow: hidden;
+    padding: 0 0 0 10px;
+}
+.login .verifImg img{
+	border:1px solid #ccc;
+	width: 134px;
+    height: 46px;
+}
+.login .login_form .button input{
+	width:82px;
+	padding:14px 0;
+	background: url(../images/login_button.gif) no-repeat right center;
+	border:none;
+	cursor:pointer;
+	color:#fff
+}
+.login .login_form .button{
+	padding:1px 0 0;
+	position:absolute;
+	right:-81px;
+	top:50px
+}
+.login .login_form .button input:hover{
+	position:absolute;
+	width:82px;
+	right:-5px;
+}
+.left_p{
+	padding:1px 0 0 0;
+	position:absolute;
+	left:-41px;
+	top:50px;
+	background: url(../images/login_button_n.gif) no-repeat left center;
+	width:42px;
+	height:60px;
+}
+.copyright{
+	text-align:center;
+	font-size:12px;
+	color:#A1BACB;
+	padding:10px 0
+}

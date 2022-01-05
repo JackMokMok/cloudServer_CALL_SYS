@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.cloudapp.core.dao.AdminDao">
+
+	<!-- 定义数据库字段与实体对象的映射关系 -->
+	<resultMap type="com.cloudapp.core.entity.Admin" id="adminMap">
+		<id property="id" javaType="java.lang.Integer" column="id" jdbcType="INTEGER" />
+		<result property="roleId"  column="role_id" jdbcType="INTEGER" />
+		<result property="username" column="username" jdbcType="VARCHAR"/>
+		
+		<result property="password" column="password" jdbcType="VARCHAR"/>
+		<result property="email" column="email" jdbcType="VARCHAR"/>
+		<result property="realname" column="realname" jdbcType="VARCHAR"/>
+		
+		<result property="status" column="status" jdbcType="INTEGER"/>
+		<result property="wxOpenid" column="wx_openid" jdbcType="VARCHAR"/>
+		<result property="roleName" column="role_name" jdbcType="VARCHAR"/>
+		
+	    <collection column="{roleId=role_id}" property="availablePaths" ofType="com.cloudapp.core.entity.RolePermission" select="getPermission" > 
+    	</collection>
+	</resultMap>
+	
+	<!-- 定义要操作的SQL语句 -->
+	<sql id="adminColumns">
+		a.id, a.role_id, a.username,
+		a.password, a.email, a.realname,
+		a.status, a.wx_openid,
+		r.name as role_name
+		from tb_admin a
+		left outer
+		join tb_role r on
+		a.role_id = r.id
+	</sql>
+	
+	<select id="getPermission"  resultType="java.lang.String">
+	    select permission
+	    from tb_role_permission
+	    where role_id = #{roleId,jdbcType =INTEGER}
+	</select>
+
+	<insert id="insert" parameterType="Admin" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_admin
+		(role_id, username, password,
+		email, realname, create_time,
+		status)
+		values
+		(#{roleId,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+		#{status,jdbcType=INTEGER})
+	</insert>
+
+    <update id="update" parameterType="Admin">
+		update tb_admin 
+		<set>
+			<if test="roleId != null">
+				role_id=#{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="username != null and username!=''">
+				username=#{username,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null and password!=''">
+				password=#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null and email!=''">
+				email=#{email,jdbcType=VARCHAR},
+			</if>
+			<if test="realname != null and realname!=''">
+				realname=#{realname,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status=#{status,jdbcType=INTEGER},
+			</if>
+			<if test="wxOpenid != null and wxOpenid != ''">
+				wx_openid=#{wxOpenid,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="delete" parameterType="int">
+		delete from tb_admin
+		where id = #{id}
+	</delete>
+
+	<select id="get" parameterType="Integer" resultMap="adminMap">
+		select
+		<include refid="adminColumns" />
+		where a.id = #{id}
+	</select>
+
+	<select id="findAll" resultMap="adminMap">
+		select
+		<include refid="adminColumns" />
+		where
+		<if test="username != null and username !=''">
+			a.username = #{username,jdbcType=VARCHAR} and
+		</if>
+		<if test="realname != null and realname !=''">
+			a.realname = #{realname,jdbcType=VARCHAR} and
+		</if>
+		<if test="roleId != null">
+			a.role_id = #{roleId,jdbcType=INTEGER} and
+		</if>
+		<if test="status != null">
+			a.status = #{status,jdbcType=INTEGER} and
+		</if>
+		1 order by a.id
+	</select>
+
+	<select id="findPage" parameterType="page" resultMap="adminMap">
+        select
+		<include refid="adminColumns" />
+		where 
+		<if test="bean.username != null and bean.username!=''">
+			a.username like CONCAT('%',#{bean.username,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="bean.realname != null and bean.realname!=''">
+			a.realname like CONCAT('%',#{bean.realname,jdbcType=VARCHAR},'%') and
+		</if>
+		<if test="bean.roleId != null">
+			a.role_id = #{bean.roleId,jdbcType=INTEGER} and
+		</if>
+		<if test="bean.status != null">
+			a.status = #{bean.status,jdbcType=INTEGER} and
+		</if>
+		1 order by a.id desc
+	</select>
+	
+	<select id="login" parameterType="Admin" resultMap="adminMap">
+		select
+		<include refid="adminColumns" />
+		where 
+		a.username = #{username,jdbcType=VARCHAR} and 
+		a.password = #{password,jdbcType=VARCHAR} and 
+		a.status   = #{status,jdbcType=INTEGER}
+	</select>
+	
+	<select id="loginByOpenid" parameterType="Admin" resultMap="adminMap">
+		select
+		<include refid="adminColumns" />
+		where 
+		a.wx_openid = #{wxOpenid,jdbcType=VARCHAR} and 
+		a.status    = #{status,jdbcType=INTEGER}
+	</select>
+</mapper> 

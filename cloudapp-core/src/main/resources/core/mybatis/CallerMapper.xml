@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.CallerDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.Caller">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="mac" property="mac" jdbcType="VARCHAR" />
+		<result column="group_id" property="groupId" jdbcType="INTEGER"/>
+		<result column="category_id" property="categoryId" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="category_name" property="categoryName" jdbcType="VARCHAR" />
+		<result column="host_name" property="hostName" jdbcType="VARCHAR" />
+		<result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+		<result column="tv_mac" property="tvMac" jdbcType="VARCHAR" />
+		<result column="customer_id" property="customerId" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		t1.id,t1.mac,t1.group_id,t1.category_id,t1.name,t1.code,t1.tv_mac,t1.customer_name,
+		t2.name as host_name,t3.name as category_name
+		from tb_caller t1
+		left outer join tb_caller_host t2 on t1.mac = t2.mac
+		left outer join tb_caller_category t3 on t1.category_id = t3.id
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		where
+		t1.id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_caller
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.Caller" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_caller
+		(id, mac, group_id, category_id, `name`, code)
+		values 
+		(#{id,jdbcType=INTEGER}, #{mac,jdbcType=VARCHAR}, #{groupId,jdbcType=INTEGER},
+		#{categoryId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR})
+	</insert>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.Caller">
+		update tb_caller
+		<set>
+			<if test="mac != null and mac != ''">
+				mac = #{mac,jdbcType=VARCHAR},
+			</if>
+
+			<if test="groupId != null">
+				group_id = #{groupId,jdbcType=INTEGER},
+			</if>
+
+			<if test="categoryId != null">
+				category_id = #{categoryId,jdbcType=INTEGER},
+			</if>
+
+			<if test="name != null and name != ''">
+				`name` = #{name,jdbcType=VARCHAR},
+			</if>
+
+			<if test="code != null and code != ''">
+				code = #{code,jdbcType=VARCHAR},
+			</if>
+
+			<if test="tvMac != null">
+				tv_mac = #{tvMac,jdbcType=VARCHAR},
+			</if>
+
+			<if test="customerName != null and customerName != ''">
+				customer_name = #{customerName,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateGroup" parameterType="com.cloudapp.core.entity.CallerGroup">
+		update tb_caller
+		set group_id = #{id,jdbcType=INTEGER}
+		where id in
+		<foreach collection="callerIds" open="(" separator="," close=")" item="did">
+			#{did}
+		</foreach>
+	</update>
+
+	<update id="updateCategory" parameterType="com.cloudapp.core.entity.CallerCategory">
+		update tb_caller
+		set category_id = #{id,jdbcType=INTEGER}
+		where id in
+		<foreach collection="callerIds" open="(" separator="," close=")" item="did">
+			#{did}
+		</foreach>
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.Caller"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="customerId != null">
+			t2.customer_id = #{customerId,jdbcType=INTEGER} and
+		</if>
+
+		<if test="mac != null and mac !=''">
+			t1.mac = #{mac,jdbcType=VARCHAR} and
+		</if>
+
+		<if test="groupId != null">
+			t1.group_id = #{groupId,jdbcType=VARCHAR} and
+		</if>
+
+		<if test="categoryId != null">
+			t1.category_id = #{categoryId,jdbcType=VARCHAR} and
+		</if>
+
+		<if test="name != null and name !=''">
+			t1.name like CONCAT('%',#{name,jdbcType=VARCHAR},'%') and
+		</if>
+
+		<if test="code != null and code !=''">
+			t1.code = #{code,jdbcType=VARCHAR} and
+		</if>
+		1
+	</select>
+	
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="bean.customerId != null">
+			t2.customer_id = #{bean.customerId,jdbcType=INTEGER} and
+		</if>
+
+		<if test="bean.mac != null and bean.mac !=''">
+			t1.mac like CONCAT('%',#{bean.mac,jdbcType=VARCHAR},'%') and
+		</if>
+
+		<if test="bean.name != null and bean.name !=''">
+			t1.name like CONCAT('%',#{bean.name,jdbcType=VARCHAR},'%') and
+		</if>
+
+		<if test="bean.code != null and bean.code !=''">
+			t1.code like CONCAT('%',#{bean.code,jdbcType=VARCHAR},'%') and
+		</if>
+		1 order by t1.id desc
+	</select>
+
+	<delete id="delByArray" >
+		delete from tb_caller
+		where
+		id in
+		<foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</delete>
+
+	<delete id="delByMac" parameterType="java.lang.String">
+		delete from tb_caller
+		where
+		mac = #{mac,jdbcType=VARCHAR}
+	</delete>
+
+	<select id="getCaller" parameterType="com.cloudapp.core.entity.Caller"
+			resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		where
+		<if test="customerId != null">
+			t2.customer_id = #{customerId,jdbcType=INTEGER} and
+		</if>
+
+		<if test="mac != null and mac !=''">
+			t1.mac = #{mac,jdbcType=VARCHAR} and
+		</if>
+
+		<if test="code != null and code !=''">
+			t1.code = #{code,jdbcType=VARCHAR} and
+		</if>
+		1
+	</select>
+</mapper>

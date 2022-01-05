@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.CustomerDao">
+
+    <resultMap id="BaseResultMap" type="com.cloudapp.core.entity.Customer">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <result column="cus_group_id" property="cusGroupId" jdbcType="INTEGER" />
+        <result column="auth_count" property="authCount" jdbcType="INTEGER" />
+        <result column="auth_date" property="authDate" jdbcType="DATE" />
+        <result column="create_date" property="createDate" jdbcType="DATE" />
+        <result column="diff_day" property="diffDay" jdbcType="INTEGER" />
+        <result column="none_heart_day" property="noneHeartDay" jdbcType="INTEGER" />
+        <result column="h_time" property="hTime" jdbcType="TIMESTAMP" />
+        <result column="sorting_rules" property="sortingRules" jdbcType="INTEGER" />
+        <result column="off_day" property="offDay" jdbcType="INTEGER" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+		c.id, c.name, c.code,
+		c.cus_group_id,c.auth_count,c.h_time,
+		c.auth_date, c.create_date, TIMESTAMPDIFF(DAY,CURDATE(),c.auth_date) as diff_day,
+		TIMESTAMPDIFF(DAY,c.h_time,NOW()) as none_heart_day
+		from tb_customer c
+	</sql>
+
+    <select id="getCustomers" resultMap="BaseResultMap" parameterType="com.cloudapp.core.entity.Customer">
+		select
+		cc.id,cc.name,MAX(cc.h_time) as h_time from
+		(select c.id,c.name,h.h_time from tb_customer c left outer join tb_caller_host d on
+		c.id = d.customer_id  left outer join tb_caller_host_heartbeat h on d.mac = h.mac) cc group by cc.name;
+	</select>
+
+    <select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List" />
+        where
+        c.id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_customer
+		where
+		id = #{id,jdbcType=INTEGER}
+	</delete>
+
+    <insert id="insert" parameterType="com.cloudapp.core.entity.Customer" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_customer
+		(id, name, code,
+		cus_group_id,auth_count,
+		auth_date, create_date)
+		values
+		(#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR},
+		#{cusGroupId,jdbcType=INTEGER},#{authCount,jdbcType=INTEGER},#{authDate,jdbcType=DATE},
+		#{createDate,jdbcType=DATE})
+	</insert>
+
+    <update id="update" parameterType="com.cloudapp.core.entity.Customer">
+        update tb_customer
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="cusGroupId != null">
+                cus_group_id = #{cusGroupId,jdbcType=INTEGER},
+            </if>
+            <if test="authCount != null">
+                auth_count = #{authCount,jdbcType=INTEGER},
+            </if>
+            <if test="authDate != null and authDate != ''">
+                auth_date = #{authDate,jdbcType=DATE},
+            </if>
+            <if test="hTime != null and hTime != ''">
+                h_time = #{hTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateGroup" parameterType="com.cloudapp.core.entity.CusGroup">
+        update tb_customer
+        set cus_group_id = #{id,jdbcType=INTEGER}
+        where id in
+        <foreach collection="cusIds" open="(" separator="," close=")" item="cid">
+            #{cid}
+        </foreach>
+    </update>
+
+    <update id="updateAuth" parameterType="com.cloudapp.core.entity.Customer">
+        update tb_customer
+        set auth_date = #{authDate,jdbcType=DATE}
+        where id in
+        <foreach collection="cusIds" open="(" separator="," close=")" item="cid">
+            #{cid}
+        </foreach>
+    </update>
+
+    <select id="findAll" parameterType="com.cloudapp.core.entity.Customer"
+            resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        where
+        <if test="name != null and name !=''">
+            c.name like CONCAT('%',#{name,jdbcType=VARCHAR},'%') and
+        </if>
+        <if test="code != null and code !=''">
+            c.code = #{code,jdbcType=VARCHAR} and
+        </if>
+        <if test="cusGroupId != null">
+            c.cus_group_id = #{cusGroupId,jdbcType=INTEGER} and
+        </if>
+
+        <if test="authDate != null and authDate != ''">
+            <![CDATA[
+				c.auth_date <= #{authDate,jdbcType=DATE} and
+			]]>
+        </if>
+        1
+    </select>
+
+    <select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        where
+        <if test="bean.id != null">
+            c.id = #{bean.id,jdbcType=INTEGER} and
+        </if>
+
+        <if test="bean.name != null and bean.name !=''">
+            c.name like CONCAT('%',#{bean.name,jdbcType=VARCHAR},'%') and
+        </if>
+
+        <if test="bean.code != null and bean.code !=''">
+            c.code = #{bean.code,jdbcType=VARCHAR} and
+        </if>
+
+        <if test="bean.cusGroupId != null">
+            c.cus_group_id = #{bean.cusGroupId,jdbcType=INTEGER} and
+        </if>
+
+        <if test="bean.authDate != null and bean.authDate != ''">
+            <![CDATA[
+				c.auth_date <= #{bean.authDate,jdbcType=DATE} and
+			]]>
+        </if>
+
+        <if test="bean.offDay != null and bean.offDay == 0">
+            c.h_time is null and
+        </if>
+
+        <if test="bean.offDay != null and bean.offDay == 1">
+            <![CDATA[
+				TIMESTAMPDIFF(DAY,c.h_time,NOW()) >= 0 and TIMESTAMPDIFF(DAY,c.h_time,NOW()) <= 2 and
+			]]>
+        </if>
+
+        <if test="bean.offDay != null and bean.offDay == 2">
+            <![CDATA[
+				TIMESTAMPDIFF(DAY,c.h_time,NOW()) >= 3 and TIMESTAMPDIFF(DAY,c.h_time,NOW()) <= 5 and
+			]]>
+        </if>
+
+        <if test="bean.offDay != null and bean.offDay == 3">
+            <![CDATA[
+				TIMESTAMPDIFF(DAY,c.h_time,NOW()) > 5 and
+			]]>
+        </if>
+
+        <choose>
+            <when test="bean.sortingRules != null and bean.sortingRules == 1">
+                1 order by c.h_time is null,c.h_time asc,c.auth_date asc,c.id desc
+            </when>
+            <when test="bean.sortingRules != null and bean.sortingRules == 2">
+                1 order by c.id asc
+            </when>
+            <when test="bean.sortingRules != null and bean.sortingRules == 3">
+                1 order by c.id desc
+            </when>
+            <otherwise>
+                1 order by c.auth_date asc,c.h_time asc,c.id desc
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

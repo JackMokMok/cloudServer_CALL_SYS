@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+	<!-- 自动扫描且只扫描@Controller -->
+	<context:component-scan base-package="com.cloudapp" />
+	
+	<!-- 启动注解驱动的Spring MVC功能，注册请求url和注解POJO类方法的映射 -->
+	<mvc:annotation-driven />
+
+	<!-- FreeMarker视图解析 --> 
+	<bean
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver"
+		p:cache="true"
+		p:viewClass="org.springframework.web.servlet.view.freemarker.FreeMarkerView"
+		p:prefix="/WEB-INF/pages/" p:suffix=".ftl" p:contentType="text/html;charset=UTF-8"
+		p:requestContextAttribute="request" p:exposeSpringMacroHelpers="true"
+		p:exposeSessionAttributes="true" p:exposeRequestAttributes="true" />
+
+	<bean id="freemarkerConfig"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/" />
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="default_encoding">UTF-8</prop>
+				<prop key="number_format">0.####</prop>     <!-- 数字转字符串不会产生逗号分割辅助符 -->
+			</props>
+		</property>
+	</bean>
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		p:maxUploadSize="1048576000" p:defaultEncoding="utf-8" />
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<!-- 需排除拦截的地址 -->
+			<mvc:exclude-mapping path="/login.html" />
+			<mvc:exclude-mapping path="/admin_login.html" />
+			<mvc:exclude-mapping path="/logout.html" />
+			<mvc:exclude-mapping path="/forbidden.html" />
+			<mvc:exclude-mapping path="/404.html" />
+			<mvc:exclude-mapping path="/checkcode.html" />
+			<mvc:exclude-mapping path="/api/*.json" />
+			<bean class="com.cloudapp.web.main.SysInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<bean id="exceptionHandler" class="com.cloudapp.web.main.MyExceptionHandler" />
+	
+</beans>

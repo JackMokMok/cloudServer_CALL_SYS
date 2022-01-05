@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cloudapp.core.dao.RolePermissionDao">
+
+	<resultMap id="BaseResultMap" type="com.cloudapp.core.entity.RolePermission">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="permission" property="permission" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id,role_id, permission
+	</sql>
+	
+	<select id="get" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from tb_role_permission where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from tb_role_permission
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.cloudapp.core.entity.RolePermission" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_role_permission 
+		(id,role_id,permission)
+		values 
+		(#{id,jdbcType=INTEGER} ,#{roleId,jdbcType=INTEGER}, #{permission,jdbcType=VARCHAR})
+	</insert>
+	<update id="updateSelective" parameterType="com.cloudapp.core.entity.RolePermission">
+		update tb_role_permission
+		<set>
+			<if test="roleId != null">
+				role_id = #{roleId,jdbcType=INTEGER},
+			</if>
+			<if test="permission != null">
+				permission = #{permission,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<update id="update" parameterType="com.cloudapp.core.entity.RolePermission">
+		update tb_role_permission
+		set 
+		role_id = #{roleId,jdbcType=INTEGER},
+		permission = #{permission,jdbcType=VARCHAR}
+		where 
+		id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="findAll" parameterType="com.cloudapp.core.entity.RolePermission"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_role_permission where
+		<if test="roleId != null">
+			role_id = #{roleId,jdbcType=INTEGER} and
+		</if>
+		<if test="permission != null and permission !=''">
+			permission = #{permission,jdbcType=VARCHAR} and
+		</if>
+		1=1
+	</select>
+	<select id="findPage" parameterType="Page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_role_permission where
+		<if test="bean.roleId != null">
+			role_id = #{bean.roleId,jdbcType=INTEGER} and
+		</if>
+		<if test="bean.permission != null and bean.permission !=''">
+			permission = #{bean.permission,jdbcType=VARCHAR} and
+		</if>
+		1=1 order by id desc
+	</select>
+	
+	<delete id="delByRoleId" parameterType="java.lang.Integer">
+		delete from tb_role_permission
+		where role_id = #{id,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="saveList" parameterType="java.util.List" >
+		insert into tb_role_permission 
+		(id,role_id,permission)
+		values
+		<foreach collection="list" item="item" separator=",">
+			(#{item.id,jdbcType=INTEGER},
+			#{item.roleId,jdbcType=INTEGER}, 
+			#{item.permission,jdbcType=VARCHAR})
+        </foreach>
+	</insert>
+</mapper>
