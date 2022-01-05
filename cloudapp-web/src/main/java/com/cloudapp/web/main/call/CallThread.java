@@ -80,6 +80,7 @@ public class CallThread extends Thread {
     public void run() {
         try {
             logger.warn("Socket启动...");
+            logger.warn("Socket启动2...");
             serverSocket = new ServerSocket(10086);
             while (true){
                 final Socket socket = serverSocket.accept();
